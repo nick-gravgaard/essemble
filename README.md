@@ -2,9 +2,11 @@
 
 A tool to assemble essay PDFs from Markdown files and coversheet templates
 
----
+## Why?
 
-Essemble assembles essays from Markdown files and inserts a coversheet as the first page. The coversheet is populated from metadata in the Markdown file, as well as a word count.
+Many students and academics use Markdown to write their essays and papers. Unlike conventional word processors, this approach means one's source documents are text files, and changes can easily be tracked using version control systems like Git. However there's a downside - it's easy to copy and paste the coversheet to the front of one's essay using a word processor, but how do we do that if we're using Markdown? This is the problem Essemble tries to solve.
+
+Essemble assembles essays from Markdown files and inserts a coversheet as the first page. The coversheet is populated from metadata in the Markdown file, as well as a word count. Since the information for the coversheet is in the Markdown file, this means it's tracked by your version control system, and can be edited using your normal text editing tools.
 
 Since each university has their own coversheet, I've tried to come up with a process which makes it easy to create HTML templates from coversheets. Please contribute any templates you make back so other students from your university can benefit.
 
