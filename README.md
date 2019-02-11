@@ -18,7 +18,7 @@ Essemble requires the installation of some other tools before it will work. Spec
 
 * [Ammonite](https://ammonite.io/), which is the Scala based scripting language Essemble is written in.
 * [Pandoc](https://pandoc.org/), for generating PDFs from Markdown files (to convert the essay Markdown to a PDF).
-* [Poppler](https://poppler.freedesktop.org), for the pdftotext and pdfunite tools. pdftotext is used for generating text files from PDFs (for word counting), while pdfunite is used for joining PDFs (to add the coversheet PDF to the front of the essay PDF).
+* [Poppler](https://poppler.freedesktop.org), for the pdftotext and pdfunite utils. pdftotext is used for generating text files from PDFs (for word counting), while pdfunite is used for joining PDFs (to add the coversheet PDF to the front of the essay PDF).
 * [wkhtmltopdf](https://wkhtmltopdf.org/), for generating high quality PDFs from HTML files (to convert the populated coversheet to a PDF).
 
 #### Ubuntu
