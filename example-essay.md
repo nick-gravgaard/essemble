@@ -37,7 +37,6 @@ look like:
 
 Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
 in chapters 12--14"). Three dots ... will be converted to an ellipsis.
-Unicode is supported. 😂
 
 ## An h2 header
 
@@ -162,7 +161,7 @@ Here's a "line block" (note how whitespace is honoured):
 
 This is the last line that will be included in the word count.
 
-##Bibliography
+## Bibliography
 
 Chakravartty, Anjan. "Scientific Realism", *The Stanford Encyclopedia of Philosophy* (Winter 2018 Edition), Edward N. Zalta (ed.). <https://plato.stanford.edu/archives/win2018/entries/scientific-realism/> (accessed December 30, 2017)
 

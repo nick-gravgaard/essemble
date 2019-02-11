@@ -50,7 +50,7 @@ def countWords(proseLines: List[String], countUntilOption: Option[String], tempD
   val tempWordCountableTxt =  tempDir + "/temp-word-countable.txt"
 
   write(Path(tempWordCountableMd), countableProse)
-  %%pandoc(tempWordCountableMd, "-s", "-o", tempWordCountablePdf, "--latex-engine=xelatex")
+  %%pandoc(tempWordCountableMd, "-s", "-o", tempWordCountablePdf)
   %%pdftotext(tempWordCountablePdf, tempWordCountableTxt)
   val splitText = read(Path(tempWordCountableTxt)).split(Array('\n', ' '))
   // each page in the PDF ends with a page number and a form-feed, so after we get the word count, subtract the number of form-feeds * 2
@@ -99,7 +99,7 @@ def generateEssay(config: Map[String, String], markdownFilename: String, templat
     val populatedTemplate = interpolate(template, modifiedConfig)
     write(Path(tempCoversheetHtml), populatedTemplate)
     %%wkhtmltopdf(tempCoversheetHtml, tempCoversheetPdf)
-    %%pandoc(pwd/markdownFilename, "-s", "-o", tempEssayPdf, "--latex-engine=xelatex")
+    %%pandoc(pwd/markdownFilename, "-s", "-o", tempEssayPdf)
     val resultFilename = modifiedConfig.getOrElse("result-filename", markdownFilename.splitAt(markdownFilename.lastIndexOf('.'))._1 + ".pdf")
     %%pdfunite(tempCoversheetPdf, tempEssayPdf, pwd/resultFilename)
 

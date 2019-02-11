@@ -38,15 +38,9 @@ First, install the Homebrew package manager by following the instructions at <ht
 Then, run the following command to install the other requirements:
 
 ```sh
-brew install ammonite-repl pandoc poppler wkhtmltopdf
-```
-
-### Permissions
-
-You need to let your operating system execute the `essemble` script. In a terminal, cd to wherever you've installed Essemble and run:
-
-```sh
-chmod +x essemble
+brew install ammonite-repl pandoc poppler
+brew cask install wkhtmltopdf
+brew cask install basictex
 ```
 
 ### Putting Essemble in your PATH
