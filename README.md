@@ -83,7 +83,7 @@ The text between the `---` lines uses the [YAML](https://yaml.org/) format. Esse
 
 ### Make a coversheet template or find one to reuse
 
-At the moment Essemble only has a coversheet for King's College London's Faculty of Arts & Humanities. If that's useful to you, you should use the text `kcl.ac.uk/arts_humanities.html` for the value `coversheet-template-filename` in the essay's metadata. Otherwise you'll need to generate a template from your university's coversheet. To do this, you need to edit the coversheet in Word or whatever, and instead of inserting your real details you need to insert the names of the fields you want to replace, eg: `{{ module-title }}`. For King's College London's coversheet I needed the ability to index the values one character at a time, and you can do that by appending the field name with the index in square brackets, eg. `{{ candidate-number[0] }}`. The coversheet also had some checkboxes which I replaced with fields I give values like `☐` and `☑`. Save or export the file as HTML, and place it in a directory named after your university's domain name in Essemble's coversheets directory. Give it a name based on which subjects/faculty uses it, and then use the directory name and file name in the `coversheet-template-filename` value.
+At the moment Essemble only has a coversheet for King's College London's Faculty of Arts & Humanities. If that's useful to you, you should use the text `kcl.ac.uk/arts_humanities.html` for the value `coversheet-template-filename` in the essay's metadata. Otherwise you'll need to generate a template from your university's coversheet. To do this, you need to edit the coversheet in Word or whatever, and instead of inserting your real details you need to insert the names of the fields you want to replace, eg: `{{ module-title }}`. For King's College London's coversheet I needed the ability to index the values one character at a time, and you can do that by appending the field name with the index in square brackets, eg. `{{ candidate-number[0] }}`. The coversheet also had some checkboxes which I replaced with fields I give the values `☐` and `☑`. Save or export the file as HTML, and place it in a directory named after your university's domain name in Essemble's coversheets directory. Give it a name based on which subjects/faculty uses it, and then use the directory name and file name in the `coversheet-template-filename` value.
 
 ### Running it
 
@@ -94,6 +94,8 @@ essemble example-essay.md
 ```
 
 By default, the resulting PDF will have the same name as the original Markdown file but with the .pdf extension. You can override that using the `result-filename` value in the metadata. The file will be created in your current directory.
+
+## That's it!
 
 I hope you find this program useful!
 
