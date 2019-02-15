@@ -59,53 +59,48 @@ def countWords(proseLines: List[String], countUntilOption: Option[String], tempD
 
 @main
 def main(markdownFilename: String) = {
-  val text = read(pwd/markdownFilename)
-  getConfigFromText(text) match {
-    case Left(err) => println("There was an error processing the YAML at the top of the Markdown file. The error message was: " + err)
-    case Right(config) => {
-      config.get("coversheet-template-filename") match {
-        case Some(templateFilename) => generateEssay(config, markdownFilename, templateFilename)
+  val markdownPath =Path(s"$pwd/$markdownFilename")
+  val templateDir = s"$pwd/coversheets"
+
+  Try(read(markdownPath)) match {
+    case Failure(_) => println(s"Cannot find Markdown file: $markdownPath")
+    case Success(text) => getConfigFromText(text) match {
+      case Left(err) => println("There was an error processing the YAML at the top of the Markdown file. The error message was: " + err)
+      case Right(config) => config.get("coversheet-template-filename") match {
         case None => println("""Cannot find "coversheet-template-filename" in YAML at the top of the Markdown file""")
+        case Some(templateFilename) => Try(read(Path(s"$templateDir/$templateFilename"))) match {
+          case Failure(_) => println(s"Cannot find template file: $templateDir/$templateFilename")
+          case Success(template) => generateEssay(config, markdownPath, text, template)
+        }
       }
     }
   }
 }
 
-def generateEssay(config: Map[String, String], markdownFilename: String, templateFilename: String) = {
-  val markdownPath =Path(s"$pwd/$markdownFilename")
-  val templateDir = "coversheets"
-  val templatePath = Path(s"$pwd/$templateDir/$templateFilename")
-  if (!exists(markdownPath)) {
-    println(s"Cannot find Markdown file: $markdownPath")
-  } else if (!exists(templatePath)) {
-    println(s"Cannot find template file: $templatePath")
-  } else {
-    val text = read(markdownPath)
-    val template = read(templatePath)
+def generateEssay(config: Map[String, String], markdownPath: Path, text: String, template: String) = {
+  val tempDir = tmp.dir()
 
-    val tempDir = tmp.dir()
+  val proseLines = text.split('\n').toList.dropWhile(_ != "---").drop(1).dropWhile(_ != "---").drop(1)
 
-    val proseLines = text.split('\n').toList.dropWhile(_ != "---").drop(1).dropWhile(_ != "---").drop(1)
-
-    val modifiedConfig = config.get("word-count") match {
-      case Some(_) => config
-      case None => config + ("word-count" -> countWords(proseLines, config.get("count-until"), tempDir).toString)
-    }
-
-    val tempCoversheetHtml =  tempDir + "/temp-coversheet.html"
-    val tempCoversheetPdf =  tempDir + "/temp-coversheet.pdf"
-    val tempEssayPdf =  tempDir + "/temp-essay.pdf"
-
-    val populatedTemplate = interpolate(template, modifiedConfig)
-    write(Path(tempCoversheetHtml), populatedTemplate)
-    %%wkhtmltopdf(tempCoversheetHtml, tempCoversheetPdf)
-    %%pandoc(pwd/markdownFilename, "-s", "-o", tempEssayPdf)
-    val resultFilename = modifiedConfig.getOrElse("result-filename", markdownFilename.splitAt(markdownFilename.lastIndexOf('.'))._1 + ".pdf")
-    %%pdfunite(tempCoversheetPdf, tempEssayPdf, pwd/resultFilename)
-
-    println(s"Compiled essay saved as ${pwd/resultFilename}")
-
-    rm! tempDir
+  val modifiedConfig = config.get("word-count") match {
+    case Some(_) => config
+    case None => config + ("word-count" -> countWords(proseLines, config.get("count-until"), tempDir).toString)
   }
+
+  val tempCoversheetHtml =  tempDir + "/temp-coversheet.html"
+  val tempCoversheetPdf =  tempDir + "/temp-coversheet.pdf"
+  val tempEssayPdf =  tempDir + "/temp-essay.pdf"
+
+  val populatedTemplate = interpolate(template, modifiedConfig)
+  write(Path(tempCoversheetHtml), populatedTemplate)
+  %%wkhtmltopdf(tempCoversheetHtml, tempCoversheetPdf)
+  %%pandoc(markdownPath, "-s", "-o", tempEssayPdf)
+  val markdownFilename = markdownPath.toString
+  val resultFilename = modifiedConfig.getOrElse("result-filename", markdownFilename.splitAt(markdownFilename.lastIndexOf('.'))._1 + ".pdf")
+  %%pdfunite(tempCoversheetPdf, tempEssayPdf, pwd/resultFilename)
+
+  println(s"Compiled essay saved as ${pwd/resultFilename}")
+
+  rm! tempDir
 }
 
