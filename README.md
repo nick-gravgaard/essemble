@@ -45,7 +45,7 @@ brew cask install basictex
 
 ### Putting Essemble in your PATH
 
-Unless you don't mind specifying it's exact location every time you run it, you'll want to include Essemble's directory in your path. You should add a line like this `export PATH=$PATH:/wherever/you/put/essemble` to your shell's start up script (by default~/.bashrc on Ubuntu, or ~/.bash_profile on the Mac).
+Unless you don't mind specifying it's exact location every time you run it, you'll want to include Essemble's directory in your path. You should add a line like `export PATH=$PATH:/wherever/you/put/essemble` to your shell's start up script (by default ~/.bashrc on Ubuntu, or ~/.bash_profile on the Mac).
 
 ## How to use
 
