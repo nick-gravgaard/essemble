@@ -45,21 +45,21 @@ def countWords(proseLines: List[String], countUntilOption: Option[String], tempD
     case None => proseLines
   }).mkString("\n")
 
-  val tempWordCountableMd =  tempDir + "/temp-word-countable.md"
-  val tempWordCountablePdf =  tempDir + "/temp-word-countable.pdf"
-  val tempWordCountableTxt =  tempDir + "/temp-word-countable.txt"
+  val tempWordCountableMd = tempDir + "/temp-word-countable.md"
+  val tempWordCountablePdf = tempDir + "/temp-word-countable.pdf"
+  val tempWordCountableTxt = tempDir + "/temp-word-countable.txt"
 
   write(Path(tempWordCountableMd), countableProse)
   %%pandoc(tempWordCountableMd, "-s", "-o", tempWordCountablePdf)
   %%pdftotext(tempWordCountablePdf, tempWordCountableTxt)
   val splitText = read(Path(tempWordCountableTxt)).split(Array('\n', ' '))
-  // each page in the PDF ends with a page number and a form-feed, so after we get the word count, subtract the number of form-feeds * 2
+  // each page in the PDF ends with 2 things; a page number and a form-feed, so subtract the number of form-feeds * 2 from the word count
   splitText.filter(_ != "").length - (splitText.filter(_ == "\f").length * 2)
 }
 
 @main
 def main(markdownFilename: String) = {
-  val markdownPath =Path(s"$pwd/$markdownFilename")
+  val markdownPath = Path(s"$pwd/$markdownFilename")
   val templateDir = s"$pwd/coversheets"
 
   Try(read(markdownPath)) match {
@@ -87,9 +87,9 @@ def generateEssay(config: Map[String, String], markdownPath: Path, text: String,
     case None => config + ("word-count" -> countWords(proseLines, config.get("count-until"), tempDir).toString)
   }
 
-  val tempCoversheetHtml =  tempDir + "/temp-coversheet.html"
-  val tempCoversheetPdf =  tempDir + "/temp-coversheet.pdf"
-  val tempEssayPdf =  tempDir + "/temp-essay.pdf"
+  val tempCoversheetHtml = tempDir + "/temp-coversheet.html"
+  val tempCoversheetPdf = tempDir + "/temp-coversheet.pdf"
+  val tempEssayPdf = tempDir + "/temp-essay.pdf"
 
   val populatedTemplate = interpolate(template, modifiedConfig)
   write(Path(tempCoversheetHtml), populatedTemplate)
