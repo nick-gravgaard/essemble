@@ -90,7 +90,7 @@ At the moment Essemble only has a coversheet for King's College London's Faculty
 It's a good idea to cd to the same directory as where your Markdown file is, and then run the following command:
 
 ```sh
-essemble example-essay.md
+./essemble.sc example-essay.md
 ```
 
 By default, the resulting PDF will have the same name as the original Markdown file but with the .pdf extension. You can override that using the `result-filename` value in the metadata. The file will be created in your current directory.
