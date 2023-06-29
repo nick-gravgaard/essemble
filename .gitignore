@@ -1,3 +1,9 @@
+.bsp
+.metals
+.scala-build
+.vscode
+result1234.pdf
+
 *.class
 *.log
 .DS_Store

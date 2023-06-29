@@ -16,7 +16,7 @@ Since each university has their own coversheet, I've tried to come up with a pro
 
 Essemble requires the installation of some other tools before it will work. Specifically:
 
-* [Ammonite](https://ammonite.io/), which is the Scala based scripting language Essemble is written in.
+* [Scala CLI](https://scala-cli.virtuslab.org/), which is a command-line tool for running Scala scripts.
 * [Pandoc](https://pandoc.org/), for generating PDFs from Markdown files (to convert the essay Markdown to a PDF).
 * [Poppler](https://poppler.freedesktop.org), for the pdftotext and pdfunite utils. pdftotext is used for generating text files from PDFs (for word counting), while pdfunite is used for joining PDFs (to add the coversheet PDF to the front of the essay PDF).
 * [wkhtmltopdf](https://wkhtmltopdf.org/), for generating high quality PDFs from HTML files (to convert the populated coversheet to a PDF).
@@ -29,7 +29,7 @@ First, run the following command to install the other requirements:
 sudo apt-get install default-jre pandoc poppler-utils wkhtmltopdf
 ```
 
-Then, install Ammonite by following the instructions at <https://ammonite.io/#Ammonite-REPL>
+Then, install Scala CLI by following the instructions at <https://scala-cli.virtuslab.org/install>
 
 #### Mac
 
@@ -38,7 +38,7 @@ First, install the Homebrew package manager by following the instructions at <ht
 Then, run the following command to install the other requirements:
 
 ```sh
-brew install ammonite-repl pandoc poppler
+brew install Virtuslab/scala-cli/scala-cli pandoc poppler
 brew cask install wkhtmltopdf
 brew cask install basictex
 ```
@@ -98,4 +98,3 @@ By default, the resulting PDF will have the same name as the original Markdown f
 ## That's it!
 
 I hope you find this program useful!
-
