@@ -13,11 +13,14 @@ import io.circe.yaml.parser
 import io.circe.Json.fromString
 import os.{Path, RelPath, proc, pwd, read, remove, temp, write}
 
-sealed trait Error(val message: String)
-case class NoMarkdownFile(markdownPath: Path) extends Error(s"Cannot find Markdown file: $markdownPath")
-case class BadYAML(err: String) extends Error(s"There was an error processing the YAML at the top of the Markdown file. The error message was: $err")
-case object NoTemplateFilename extends Error("""Cannot find "coversheet-template-filename" in YAML at the top of the Markdown file""")
-case class NoTemplateFile(templatePath: Path) extends Error(s"Cannot find template file: $templatePath")
+enum Error(val message: String) {
+  case NoMarkdownFile(markdownPath: Path) extends Error(s"Cannot find Markdown file: $markdownPath")
+  case BadYAML(err: String) extends Error(s"There was an error processing the YAML at the top of the Markdown file. The error message was: $err")
+  case NoTemplateFilename extends Error("""Cannot find "coversheet-template-filename" in YAML at the top of the Markdown file""")
+  case NoTemplateFile(templatePath: Path) extends Error(s"Cannot find template file: $templatePath")
+}
+
+import Error.*
 
 def interpolate(text: String, map: Map[String, String]): String = {
   def replacer(m: Match): String = m match {
