@@ -12,8 +12,6 @@ Since each university has their own coversheet, I've tried to come up with a pro
 
 ## Installation
 
-### Requirements
-
 Essemble requires the installation of some other tools before it will work. Specifically:
 
 * [Scala CLI](https://scala-cli.virtuslab.org/), which is a command-line tool for running Scala scripts.
@@ -21,31 +19,35 @@ Essemble requires the installation of some other tools before it will work. Spec
 * [Poppler](https://poppler.freedesktop.org), for the pdftotext and pdfunite utils. pdftotext is used for generating text files from PDFs (for word counting), while pdfunite is used for joining PDFs (to add the coversheet PDF to the front of the essay PDF).
 * [wkhtmltopdf](https://wkhtmltopdf.org/), for generating high quality PDFs from HTML files (to convert the populated coversheet to a PDF).
 
-#### Ubuntu
+### Scala CLI
 
-First, run the following command to install the other requirements:
+Scala developers should strongly consider installing [Coursier](https://get-coursier.io/docs/cli-installation), as Scala CLI is installed automatically when you run `cs setup`.
+
+Non Scala developers can install Scala CLI by following the instructions at <https://scala-cli.virtuslab.org/install>
+
+### Other requirements (Ubuntu)
+
+Run the following command to install the other requirements:
 
 ```sh
-sudo apt-get install default-jre pandoc poppler-utils wkhtmltopdf
+sudo apt-get install pandoc poppler-utils wkhtmltopdf
 ```
 
-Then, install Scala CLI by following the instructions at <https://scala-cli.virtuslab.org/install>
-
-#### Mac
+### Other requirements (Mac)
 
 First, install the Homebrew package manager by following the instructions at <https://brew.sh/#install>
 
 Then, run the following command to install the other requirements:
 
 ```sh
-brew install Virtuslab/scala-cli/scala-cli pandoc poppler
+brew install pandoc poppler
 brew cask install wkhtmltopdf
 brew cask install basictex
 ```
 
 ### Putting Essemble in your PATH
 
-Unless you don't mind specifying it's exact location every time you run it, you'll want to include Essemble's directory in your path. You should add a line like `export PATH=$PATH:/wherever/you/put/essemble` to your shell's start up script (by default ~/.bashrc on Ubuntu, or ~/.bash_profile on the Mac).
+Unless you don't mind specifying it's exact location every time you run it, you'll want to include Essemble's directory in your path. You should add a line like `export PATH=$PATH:/wherever/you/put/essemble.sc` to your shell's start up script (`~/.bashrc`, `~/.zshrc`, or whatever depending on which shell you use).
 
 ## How to use
 
@@ -90,7 +92,7 @@ At the moment Essemble only has a coversheet for King's College London's Faculty
 It's a good idea to cd to the same directory as where your Markdown file is, and then run the following command:
 
 ```sh
-./essemble.sc example-essay.md
+essemble.sc my-essay.md
 ```
 
 By default, the resulting PDF will have the same name as the original Markdown file but with the .pdf extension. You can override that using the `result-filename` value in the metadata. The file will be created in your current directory.
