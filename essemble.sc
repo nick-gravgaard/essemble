@@ -13,23 +13,27 @@ import io.circe.yaml.parser
 import io.circe.Json.fromString
 import os.{Path, RelPath, proc, pwd, read, remove, temp, write}
 
-def interpolate(text: String, map: Map[String, String]) = {
+sealed trait Error(val message: String)
+case class NoMarkdownFile(markdownPath: Path) extends Error(s"Cannot find Markdown file: $markdownPath")
+case class BadYAML(err: String) extends Error(s"There was an error processing the YAML at the top of the Markdown file. The error message was: $err")
+case object NoTemplateFilename extends Error("""Cannot find "coversheet-template-filename" in YAML at the top of the Markdown file""")
+case class NoTemplateFile(templatePath: Path) extends Error(s"Cannot find template file: $templatePath")
+
+def interpolate(text: String, map: Map[String, String]): String = {
   def replacer(m: Match): String = m match {
     case Regex.Groups(found) => {
-      val keyAndIndexPattern = """([A-Za-z-]+)(\[\d+\])?""".r
-      val maybeKeyIndex: Option[(String, String)] = found.trim match {
-        case keyAndIndexPattern(key, index) => Some((key, index))
-        case _ => None
-      }
-      maybeKeyIndex match {
-        case Some((key, index)) => map.get(key) match {
-          case Some(result) => Option(index) match {
-            case None => result.toString
-            case Some(_) => result.toString.apply(index.drop(1).dropRight(1).toInt).toString // remove surrounding square brackets
-          }
-          case None => ""
-        }
-        case None => ""
+      val keyAndIndexPattern = """([A-Za-z-]+)\[([0-9]+)\]""".r
+      val keyPattern = """([A-Za-z-]+)""".r
+      found.trim match {
+        case keyAndIndexPattern(key, indexStrOrNull) =>
+          val maybeChar = for {
+            value <- map.get(key)
+            index <- Option(indexStrOrNull).flatMap(_.toIntOption)
+            char <- value.lift(index)
+          } yield char
+          maybeChar.map(_.toString).getOrElse("")
+        case keyPattern(key) => key
+        case _ => ""
       }
     }
   }
@@ -39,14 +43,10 @@ def interpolate(text: String, map: Map[String, String]) = {
 
 def getConfigFromText(text: String): Either[String, Map[String, String]] = {
   val yaml = text.split('\n').dropWhile(_ != "---").drop(1).takeWhile(_ != "---").mkString("\n")
-  Try(parser.parse(yaml)) match {
-    case Success(Right(obj)) => obj.hcursor.downField("essemble").as[Map[String, String]] match {
-      case Right(res) => Right(res)
-      case Left(err) => Left(err.toString)
-    }
-    case Success(Left(err)) => Left(err.toString)
-    case Failure(err) => Left(err.toString)
-  }
+  (for {
+    parsed <- parser.parse(yaml)
+    config <- parsed.hcursor.downField("essemble").as[Map[String, String]]
+  } yield config).left.map(_.toString)
 }
 
 def countWords(proseLines: List[String], countUntilOption: Option[String], tempDir: Path): Int = {
@@ -67,26 +67,22 @@ def countWords(proseLines: List[String], countUntilOption: Option[String], tempD
   splitText.filter(_ != "").length - (splitText.filter(_ == "\f").length * 2)
 }
 
-def main(markdownFilename: String) = {
+def main(markdownFilename: String): Unit = {
   val markdownPath = pwd / markdownFilename
   val templateDir = pwd / "coversheets"
 
-  Try(read(markdownPath)) match {
-    case Failure(_) => println(s"Cannot find Markdown file: $markdownPath")
-    case Success(text) => getConfigFromText(text) match {
-      case Left(err) => println("There was an error processing the YAML at the top of the Markdown file. The error message was: " + err)
-      case Right(config) => config.get("coversheet-template-filename") match {
-        case None => println("""Cannot find "coversheet-template-filename" in YAML at the top of the Markdown file""")
-        case Some(templateFilename) => Try(read(templateDir / RelPath(templateFilename))) match {
-          case Failure(_) => println(s"Cannot find template file: $templateDir/$templateFilename")
-          case Success(template) => generateEssay(config, markdownPath, text, template)
-        }
-      }
-    }
-  }
+  val res = for {
+    text <- Try(read(markdownPath)).toEither.left.map(_ => NoMarkdownFile(markdownPath))
+    config <- getConfigFromText(text).left.map(err => BadYAML(err))
+    templateFilename <- config.get("coversheet-template-filename").map(Right.apply).getOrElse(Left(NoTemplateFilename))
+    templatePath = templateDir / RelPath(templateFilename)
+    template <- Try(read(templatePath)).toEither.left.map(_ => NoTemplateFile(templatePath))
+  } yield generateEssay(config, markdownPath, text, template)
+
+  res.left.foreach { err => println(err.message) }
 }
 
-def generateEssay(config: Map[String, String], markdownPath: Path, text: String, template: String) = {
+def generateEssay(config: Map[String, String], markdownPath: Path, text: String, template: String): Unit = {
   val tempDir = temp.dir()
 
   val proseLines = text.split('\n').toList.dropWhile(_ != "---").drop(1).dropWhile(_ != "---").drop(1)
@@ -114,9 +110,7 @@ def generateEssay(config: Map[String, String], markdownPath: Path, text: String,
 }
 
 def removeDir(dir: Path) = {
-  for (file <- dir.toIO.listFiles) {
-    remove(Path(file))
-  }
+  dir.toIO.listFiles.foreach { file => remove(Path(file)) }
   remove(dir)
 }
 
